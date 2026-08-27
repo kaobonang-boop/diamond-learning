@@ -82,6 +82,17 @@ DETAILED_SUBJECTS = {
         ],
         "paper_numbers": ["Paper 1 (Multiple Choice)", "Paper 3 (Theory)", "Paper 5 (Alt. to Practical)"],
     },
+    ("BGCSE", "Biology"): {
+        "topics": [
+            ("Digestive System", "How the body breaks down and absorbs food.",
+             ["Name the organs of the digestive system in order", "Explain the role of enzymes in digestion", "Describe absorption in the small intestine"]),
+            ("Cell Biology", "The structure and function of plant and animal cells.",
+             ["Label a plant and animal cell", "Compare plant and animal cell structures", "Explain the function of key organelles"]),
+            ("Respiration", "How organisms release energy from food.",
+             ["Distinguish aerobic and anaerobic respiration", "Write word equations for respiration", "Explain gas exchange in the lungs"]),
+        ],
+        "paper_numbers": ["Paper 1 (Multiple Choice)", "Paper 3 (Theory)", "Paper 4 (Practical Test)", "Paper 5 (Alt. to Practical)"],
+    },
     ("JCE", "Mathematics"): {
         "topics": [
             ("Number", "Working confidently with all number types.",
@@ -90,6 +101,15 @@ DETAILED_SUBJECTS = {
              ["Simplify expressions", "Solve linear equations", "Substitute into formulae"]),
             ("Geometry and Measurement", "Shapes, area, volume, and angles.",
              ["Calculate area and perimeter", "Calculate volume of solids", "Find missing angles"]),
+        ],
+        "paper_numbers": ["Paper 1", "Paper 2"],
+    },
+    ("JCE", "Science"): {
+        "topics": [
+            ("Digestive System", "How food is broken down and used by the body.",
+             ["Name the main organs of the digestive system", "Describe the journey of food through the body", "Explain the role of digestive enzymes"]),
+            ("Forces and Motion", "How things move and what makes them move.",
+             ["Describe the effects of forces", "Calculate speed from distance and time", "Explain gravity's effect on falling objects"]),
         ],
         "paper_numbers": ["Paper 1", "Paper 2"],
     },
@@ -110,6 +130,15 @@ DETAILED_SUBJECTS = {
              ["Compare and order fractions", "Convert between fractions and decimals", "Add and subtract fractions"]),
             ("Shapes and Space", "Recognising and measuring 2D and 3D shapes.",
              ["Identify properties of 2D shapes", "Calculate area and perimeter", "Recognise 3D shapes and their nets"]),
+        ],
+        "paper_numbers": ["Paper 1"],
+    },
+    ("PSLE", "Science"): {
+        "topics": [
+            ("Digestive System", "How our bodies use the food we eat.",
+             ["Name the main parts of the digestive system", "Describe why we need to digest food", "Explain simple healthy eating habits"]),
+            ("Living Things", "Classifying and understanding living organisms.",
+             ["Group living things by their features", "Describe basic life processes", "Explain simple food chains"]),
         ],
         "paper_numbers": ["Paper 1"],
     },
