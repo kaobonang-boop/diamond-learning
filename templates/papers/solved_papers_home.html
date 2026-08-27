@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block title %}Solved Papers — Diamond Learning{% endblock %}
+{% block content %}
+<div class="syl-hero"><h1>Solved Papers</h1><p>The same past papers, worked through step by step with full answers.</p></div>
+{% include "papers/_level_grid.html" with levels=levels url_name="papers:solved_papers_subject" %}
+{% endblock %}

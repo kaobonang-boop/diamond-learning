@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Search — Diamond Learning{% endblock %}
+{% block content %}
+<div class="syl-hero">
+  <h1>Search results{% if q %} for "{{ q }}"{% endif %}</h1>
+</div>
+
+<div class="subject-panel" style="margin-bottom:14px;">
+  <h3>Subjects</h3>
+  {% for s in results.subjects %}<p class="desc"><a href="{% url 'syllabus:subject_detail' s.education_level.code|lower s.slug %}">{{ s.name }} ({{ s.education_level.code }})</a></p>{% empty %}<p class="desc">No matches.</p>{% endfor %}
+</div>
+<div class="subject-panel" style="margin-bottom:14px;">
+  <h3>Topics</h3>
+  {% for t in results.topics %}<p class="desc"><a href="{% url 'syllabus:subject_detail' t.subject.education_level.code|lower t.subject.slug %}">{{ t.title }} — {{ t.subject.name }}</a></p>{% empty %}<p class="desc">No matches.</p>{% endfor %}
+</div>
+<div class="subject-panel" style="margin-bottom:14px;">
+  <h3>Notes</h3>
+  {% for n in results.notes %}<p class="desc"><a href="{% url 'notes:note_detail' n.id %}">{{ n.title }}</a></p>{% empty %}<p class="desc">No matches.</p>{% endfor %}
+</div>
+<div class="subject-panel" style="margin-bottom:14px;">
+  <h3>Past papers</h3>
+  {% for p in results.past_papers %}<p class="desc">{{ p.subject.name }} — {{ p.paper_number }} ({{ p.year }})</p>{% empty %}<p class="desc">No matches.</p>{% endfor %}
+</div>
+<div class="subject-panel" style="margin-bottom:14px;">
+  <h3>Solved questions</h3>
+  {% for sq in results.solved_questions %}<p class="desc">{{ sq.subject.name }} {{ sq.paper_number }} Q{{ sq.question_number }} ({{ sq.year }})</p>{% empty %}<p class="desc">No matches.</p>{% endfor %}
+</div>
+<div class="subject-panel">
+  <h3>Topical questions</h3>
+  {% for tq in results.topical_questions %}<p class="desc">{{ tq.topic.title }} — {{ tq.question_text|truncatechars:80 }}</p>{% empty %}<p class="desc">No matches.</p>{% endfor %}
+</div>
+{% endblock %}

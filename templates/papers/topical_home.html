@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block title %}Topical Papers — Diamond Learning{% endblock %}
+{% block content %}
+<div class="syl-hero"><h1>Topical Papers</h1><p>Practice questions grouped by topic instead of by year, so you can drill the exact thing you're stuck on.</p></div>
+{% include "papers/_level_grid.html" with levels=levels url_name="papers:topical_subject" %}
+{% endblock %}

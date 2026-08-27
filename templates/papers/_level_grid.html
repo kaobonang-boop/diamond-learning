@@ -1,0 +1,17 @@
+{% comment %} include with: levels, url_name {% endcomment %}
+{% for level in levels %}
+<div class="panel-intro">
+  <div class="panel-badge">{{ level.code }}</div>
+  <div><h2>{{ level.name }}</h2><p>Tap a subject to continue.</p></div>
+</div>
+<div class="subject-panel" style="margin-bottom:14px;">
+  <div class="subject-grid">
+    {% for subject in level.subjects.all %}
+      <a class="subject-tile" href="{% url url_name level.code|lower subject.slug %}">
+        <div class="subject-tile-icon">{{ subject.name|slice:":2"|upper }}</div>
+        <div class="subject-tile-name">{{ subject.name }}</div>
+      </a>
+    {% empty %}<p class="desc">No subjects yet.</p>{% endfor %}
+  </div>
+</div>
+{% endfor %}

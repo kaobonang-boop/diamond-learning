@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Ask Tebogo — Diamond Learning{% endblock %}
+{% block content %}
+<div class="syl-hero">
+  <h1>Ask Tebogo</h1>
+  <p>Your AI study assistant. Ask a question and get a step-by-step answer, in English or Setswana.</p>
+</div>
+
+<div class="chat-shell">
+  <div class="chat-sidebar">
+    <form method="post" action="{% url 'chatbot:new_conversation' %}" style="margin-bottom:14px;">
+      {% csrf_token %}
+      <select name="language" style="margin-bottom:10px;">
+        <option value="en">English</option>
+        <option value="tn">Setswana</option>
+      </select>
+      <button class="auth-submit" type="submit">+ New conversation</button>
+    </form>
+    {% for c in conversations %}
+      <a class="chat-convo {% if conversation and c.id == conversation.id %}active{% endif %}" href="{% url 'chatbot:chat_conversation' c.id %}">{{ c.title }}</a>
+    {% empty %}
+      <p class="desc">No conversations yet.</p>
+    {% endfor %}
+  </div>
+
+  <div class="chat-main">
+    <div class="chat-messages" id="chat-messages">
+      {% for m in messages %}
+        <div class="chat-bubble {{ m.role }}">{{ m.content }}</div>
+      {% empty %}
+        <p class="desc" style="padding:20px;">Start a new conversation and ask Tebogo anything about your subjects.</p>
+      {% endfor %}
+    </div>
+    {% if conversation %}
+    <form class="chat-input-row" id="chat-form" data-url="{% url 'chatbot:send_message' conversation.id %}">
+      {% csrf_token %}
+      <input type="text" name="message" id="chat-input" placeholder="Ask Tebogo a question…" autocomplete="off">
+      <button class="btn btn-primary" type="submit">Send</button>
+    </form>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+const form = document.getElementById('chat-form');
+if (form) {
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const input = document.getElementById('chat-input');
+    const text = input.value.trim();
+    if (!text) return;
+    const box = document.getElementById('chat-messages');
+    box.insertAdjacentHTML('beforeend', `<div class="chat-bubble user">${text}</div>`);
+    box.scrollTop = box.scrollHeight;
+    input.value = '';
+    input.disabled = true;
+
+    const typing = document.createElement('div');
+    typing.className = 'chat-bubble assistant';
+    typing.textContent = 'Tebogo is typing…';
+    box.appendChild(typing);
+    box.scrollTop = box.scrollHeight;
+
+    const formData = new FormData(form);
+    const resp = await fetch(form.dataset.url, {
+      method: 'POST',
+      headers: {'X-Requested-With': 'XMLHttpRequest'},
+      body: formData,
+    });
+    const data = await resp.json();
+    typing.remove();
+    if (data.assistant_message) {
+      box.insertAdjacentHTML('beforeend', `<div class="chat-bubble assistant">${data.assistant_message.content}</div>`);
+    }
+    box.scrollTop = box.scrollHeight;
+    input.disabled = false;
+    input.focus();
+  });
+}
+</script>
+{% endblock %}

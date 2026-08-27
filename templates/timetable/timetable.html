@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Timetable — Diamond Learning{% endblock %}
+{% block content %}
+<div class="syl-hero">
+  <h1>Study Timetable</h1>
+  <p>{{ start }} – {{ end }}</p>
+</div>
+<div class="tabs">
+  <a class="tab-btn {% if view_mode == 'weekly' %}active{% endif %}" href="?view=weekly">Weekly view</a>
+  <a class="tab-btn {% if view_mode == 'monthly' %}active{% endif %}" href="?view=monthly">Monthly view</a>
+  <a class="btn btn-primary" style="margin-left:auto;" href="{% url 'timetable:add_session' %}">+ Add study session</a>
+</div>
+<div class="subject-panel">
+  {% for day in days %}
+    <h3>{{ day.date|date:"l, d M Y" }}</h3>
+    {% for s in day.sessions %}
+      <div class="paper-card" style="margin-bottom:12px;">
+        <div class="paper-card-title">{{ s.subject.name }}{% if s.topic %} — {{ s.topic.title }}{% endif %}</div>
+        <div class="paper-card-desc">{{ s.start_time|time:"H:i" }} – {{ s.end_time|time:"H:i" }}{% if s.notes %} · {{ s.notes }}{% endif %}</div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <a class="cta" style="padding:6px 10px; font-size:0.72rem;" href="{% url 'timetable:edit_session' s.id %}">Edit</a>
+          <form method="post" action="{% url 'timetable:complete_session' s.id %}">{% csrf_token %}<button class="cta" style="padding:6px 10px; font-size:0.72rem;" type="submit">{% if s.completed %}Mark incomplete{% else %}Mark completed{% endif %}</button></form>
+          <form method="post" action="{% url 'timetable:delete_session' s.id %}">{% csrf_token %}<button class="cta" style="padding:6px 10px; font-size:0.72rem; color:var(--red); border-color:var(--red);" type="submit">Delete</button></form>
+        </div>
+        {% if s.completed %}<p class="paper-progress-text done">Completed ✓</p>{% endif %}
+      </div>
+    {% empty %}
+      <p class="desc" style="margin-bottom:16px;">Nothing scheduled.</p>
+    {% endfor %}
+  {% endfor %}
+</div>
+{% endblock %}

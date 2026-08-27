@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Notes — Diamond Learning{% endblock %}
+{% block content %}
+<div class="syl-hero">
+  <h1>Notes</h1>
+  <p>Every topic's notes in one place, organised by subject. Pick a level, then a subject, then a topic to read that note.</p>
+</div>
+{% if user.is_authenticated %}<p class="desc" style="margin-bottom:14px;"><a href="{% url 'notes:my_favourites' %}" style="color:var(--blue); font-weight:700;">★ My favourite notes</a></p>{% endif %}
+{% for level in levels %}
+<div class="panel-intro">
+  <div class="panel-badge">{{ level.code }}</div>
+  <div><h2>{{ level.name }}</h2><p>Tap a subject to see its notes.</p></div>
+</div>
+<div class="subject-panel" style="margin-bottom:14px;">
+  <div class="subject-grid">
+    {% for subject in level.subjects.all %}
+      <a class="subject-tile" href="{% url 'notes:subject_notes' level.code|lower subject.slug %}">
+        <div class="subject-tile-icon">{{ subject.name|slice:":2"|upper }}</div>
+        <div class="subject-tile-name">{{ subject.name }}</div>
+        <div class="subject-tile-meta">{{ subject.topics.count }} topics</div>
+      </a>
+    {% empty %}<p class="desc">No subjects yet.</p>{% endfor %}
+  </div>
+</div>
+{% endfor %}
+{% endblock %}

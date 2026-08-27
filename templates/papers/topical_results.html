@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Results — {{ topic.title }} — Diamond Learning{% endblock %}
+{% block content %}
+<div class="syl-hero">
+  <h1>{{ topic.title }} — Score: {{ score }}/{{ total }}</h1>
+  <p>Here's how you did, question by question.</p>
+</div>
+<div class="subject-panel">
+  {% for r in results %}
+    <div style="margin-bottom:18px; padding-bottom:16px; border-bottom:1px solid var(--border);">
+      <p style="font-weight:700;">{{ forloop.counter }}. {{ r.question.question_text }}</p>
+      <p class="paper-progress-text {% if r.is_correct %}done{% endif %}">
+        Your answer: {{ r.chosen|default:"—" }} — {% if r.is_correct %}Correct ✓{% else %}Correct answer: {{ r.question.correct_option }}{% endif %}
+      </p>
+      {% if r.question.explanation %}<p class="desc">{{ r.question.explanation }}</p>{% endif %}
+    </div>
+  {% endfor %}
+  <a class="cta" href="{% url 'papers:topical_quiz' topic.id %}">Try again</a>
+</div>
+{% endblock %}

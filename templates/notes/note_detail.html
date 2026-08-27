@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}{{ note.title }} — Diamond Learning{% endblock %}
+{% block content %}
+<div class="crumbs">
+  <a href="{% url 'notes:level_list' %}">Notes</a><span class="sep">/</span>
+  <a href="{% url 'notes:subject_notes' note.education_level.code|lower note.subject.slug %}">{{ note.subject.name }}</a><span class="sep">/</span>
+  <span class="current">{{ note.title }}</span>
+</div>
+<div class="syl-hero">
+  <h1>{{ note.title }}</h1>
+  <p>{{ note.subject.name }} · {{ note.topic.title }} · last updated {{ note.last_updated|date:"d M Y" }}</p>
+</div>
+
+{% if user.is_authenticated %}
+<div style="display:flex; gap:10px; margin-bottom:14px;">
+  <form method="post" action="{% url 'notes:toggle_favourite' note.id %}">
+    {% csrf_token %}
+    <button class="cta" type="submit">{% if is_favourite %}★ Favourited{% else %}☆ Add to favourites{% endif %}</button>
+  </form>
+  <form method="post" action="{% url 'notes:mark_note_progress' note.id %}">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="{% if read_progress.completed %}reset{% else %}complete{% endif %}">
+    <button class="cta" type="submit">{% if read_progress.completed %}Mark as unread{% else %}Mark as completed{% endif %}</button>
+  </form>
+</div>
+{% endif %}
+
+<div class="note-body">
+  {% for para in note.content.splitlines %}
+    {% if para %}<p>{{ para }}</p>{% endif %}
+  {% endfor %}
+</div>
+{% endblock %}

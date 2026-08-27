@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}My favourite notes — Diamond Learning{% endblock %}
+{% block content %}
+<div class="syl-hero"><h1>My favourite notes</h1></div>
+<div class="subject-panel">
+  <div class="paper-grid">
+    {% for fav in favourites %}
+      <a class="paper-card" href="{% url 'notes:note_detail' fav.note.id %}">
+        <div class="paper-card-title">{{ fav.note.title }}</div>
+        <div class="paper-card-desc">{{ fav.note.topic.subject.name }} · {{ fav.note.topic.title }}</div>
+      </a>
+    {% empty %}<p class="desc">You haven't favourited any notes yet.</p>{% endfor %}
+  </div>
+</div>
+{% endblock %}

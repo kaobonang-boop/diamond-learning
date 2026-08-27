@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}My Dashboard — Diamond Learning{% endblock %}
+{% block content %}
+<div class="syl-hero">
+  <h1>Welcome back, {{ user.first_name|default:user.username }}</h1>
+  <p>
+    {% if level %}You're studying towards {{ level.name }} ({{ level.code }}).{% else %}
+    Set your education level in <a href="{% url 'accounts:edit_profile' %}">Account settings</a> to unlock a personalised dashboard.{% endif %}
+  </p>
+</div>
+
+<div class="cards" style="grid-template-columns:repeat(4,1fr);">
+  <div class="fcard"><h3>{{ overall_percent }}%</h3><p class="desc">Overall syllabus progress</p></div>
+  <div class="fcard"><h3>{{ topics_completed }}</h3><p class="desc">Topics completed</p></div>
+  <div class="fcard"><h3>{{ notes_completed }}</h3><p class="desc">Notes completed</p></div>
+  <div class="fcard"><h3>{{ questions_answered }}</h3><p class="desc">Practice questions answered</p></div>
+</div>
+
+<div class="subject-panel" style="margin-bottom:14px;">
+  <h3>Your subjects</h3>
+  <div class="subject-grid">
+    {% for subject in subjects %}
+      <a class="subject-tile" href="{% url 'syllabus:subject_detail' subject.education_level.code|lower subject.slug %}">
+        <div class="subject-tile-icon">{{ subject.name|slice:":2"|upper }}</div>
+        <div class="subject-tile-name">{{ subject.name }}</div>
+      </a>
+    {% empty %}
+      <p class="desc">No subjects selected yet. <a href="{% url 'accounts:edit_profile' %}">Pick your subjects</a>.</p>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="subject-panel" style="margin-bottom:14px;">
+  <h3>Upcoming study sessions</h3>
+  {% for s in upcoming_sessions %}
+    <p class="desc">{{ s.date }} · {{ s.start_time|time:"H:i" }}–{{ s.end_time|time:"H:i" }} — {{ s.subject.name }}{% if s.topic %} ({{ s.topic.title }}){% endif %}</p>
+  {% empty %}
+    <p class="desc">Nothing scheduled. <a href="{% url 'timetable:add_session' %}">Add a study session</a>.</p>
+  {% endfor %}
+</div>
+
+<div class="subject-panel">
+  <h3>Recently updated notes</h3>
+  {% for note in recent_notes %}
+    <p class="desc"><a href="{% url 'notes:note_detail' note.id %}">{{ note.title }}</a> — {{ note.topic.subject.name }}</p>
+  {% empty %}
+    <p class="desc">No notes yet for your level.</p>
+  {% endfor %}
+</div>
+{% endblock %}

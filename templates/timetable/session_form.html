@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}{% if mode == "edit" %}Edit{% else %}Add{% endif %} study session — Diamond Learning{% endblock %}
+{% block content %}
+<div class="form-card">
+  <h2 style="margin-bottom:20px;">{% if mode == "edit" %}Edit{% else %}Add{% endif %} study session</h2>
+  <form method="post">
+    {% csrf_token %}
+    <label class="field-label">Subject</label>
+    {{ form.subject }}
+    <label class="field-label">Topic (optional)</label>
+    {{ form.topic }}
+    <label class="field-label">Date</label>
+    {{ form.date }}
+    <label class="field-label">Start time</label>
+    {{ form.start_time }}
+    <label class="field-label">End time</label>
+    {{ form.end_time }}
+    <label class="field-label">Notes</label>
+    {{ form.notes }}
+    <button class="auth-submit" type="submit">Save</button>
+  </form>
+</div>
+{% endblock %}

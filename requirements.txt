@@ -1,0 +1,12 @@
+Django==6.1
+djangorestframework==3.18.0
+python-dotenv==1.2.3
+Pillow==12.3.0
+gunicorn==26.2.0
+psycopg2-binary==2.9.12
+whitenoise==6.12.0
+
+# Optional — only needed if you set AI_PROVIDER=openai or AI_PROVIDER=anthropic
+# in .env. Uncomment whichever you use (see apps/chatbot/providers.py).
+# openai>=1.0
+# anthropic>=0.40

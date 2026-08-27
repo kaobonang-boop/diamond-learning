@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}My Progress — Diamond Learning{% endblock %}
+{% block content %}
+<div class="syl-hero">
+  <h1>My Progress</h1>
+  <p>Everything tracked in one place — how far you've gotten in Past Papers (via Topical practice), Notes, and Syllabus coverage, subject by subject.</p>
+</div>
+
+<div class="tabs">
+  {% for level in levels %}
+    <a class="tab-btn {% if active_level.id == level.id %}active{% endif %}" href="?level={{ level.code|lower }}">{{ level.code }}</a>
+  {% endfor %}
+</div>
+
+<div class="cards" style="grid-template-columns:repeat(4,1fr); margin-bottom:14px;">
+  <div class="fcard"><h3>{{ stats.questions_answered }}</h3><p class="desc">Questions answered ({{ stats.correct_answers }} correct)</p></div>
+  <div class="fcard"><h3>{{ stats.notes_completed }}</h3><p class="desc">Notes completed</p></div>
+  <div class="fcard"><h3>{{ stats.topics_completed }}</h3><p class="desc">Syllabus topics completed</p></div>
+  <div class="fcard"><h3>{{ stats.study_sessions }}</h3><p class="desc">Study sessions logged</p></div>
+</div>
+
+<div class="panel-intro">
+  <div class="panel-badge">{{ active_level.code }}</div>
+  <div>
+    <div class="mp-overall-stat"><span class="num">{{ overall }}%</span><span class="label">overall, across every subject and paper type</span></div>
+    <div class="mp-legend">
+      <span><i style="background:var(--blue);"></i>Syllabus</span>
+      <span><i style="background:var(--amber);"></i>Notes</span>
+      <span><i style="background:var(--purple);"></i>Topical Papers</span>
+    </div>
+  </div>
+</div>
+
+<div class="subject-panel">
+  <h3>Subject breakdown</h3>
+  <div class="progress-summary-grid">
+    {% for row in breakdown %}
+      <div class="progress-summary-card">
+        <h4>{{ row.subject.name }}</h4>
+        <div class="progress-summary-row">
+          <div class="progress-summary-label"><span>Syllabus</span><b>{{ row.syllabus }}%</b></div>
+          <div class="progress-summary-track"><div class="progress-summary-fill" style="width:{{ row.syllabus }}%;"></div></div>
+        </div>
+        <div class="progress-summary-row">
+          <div class="progress-summary-label"><span>Notes</span><b>{{ row.notes }}%</b></div>
+          <div class="progress-summary-track"><div class="progress-summary-fill no" style="width:{{ row.notes }}%;"></div></div>
+        </div>
+        <div class="progress-summary-row">
+          <div class="progress-summary-label"><span>Topical Papers</span><b>{{ row.topical }}%</b></div>
+          <div class="progress-summary-track"><div class="progress-summary-fill tp" style="width:{{ row.topical }}%;"></div></div>
+        </div>
+      </div>
+    {% empty %}<p class="desc">No subjects for this level yet.</p>{% endfor %}
+  </div>
+</div>
+{% endblock %}

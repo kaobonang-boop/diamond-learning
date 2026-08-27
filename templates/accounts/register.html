@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Create your account — Diamond Learning{% endblock %}
+{% block content %}
+<div class="form-card" style="max-width:600px;">
+  <h2 style="margin-bottom:6px;">Create your account</h2>
+  <p class="desc" style="color:var(--ink-soft); margin-bottom:20px;">It's free — you'll only be asked to pay when premium content launches.</p>
+  {% if form.non_field_errors %}<div class="form-errors">{{ form.non_field_errors }}</div>{% endif %}
+  <form method="post">
+    {% csrf_token %}
+    <label class="field-label">First name</label>
+    {{ form.first_name }}
+    <label class="field-label">Last name</label>
+    {{ form.last_name }}
+    <label class="field-label">Username</label>
+    {{ form.username }}
+    {% if form.username.errors %}<div class="form-errors">{{ form.username.errors }}</div>{% endif %}
+    <label class="field-label">Email</label>
+    {{ form.email }}
+    <label class="field-label">Education level</label>
+    <div class="radio-row">{{ form.education_level }}</div>
+    <label class="field-label">Subjects you're studying</label>
+    <div class="checkbox-row">{{ form.subjects }}</div>
+    <label class="field-label">Password</label>
+    {{ form.password1 }}
+    {% if form.password1.errors %}<div class="form-errors">{{ form.password1.errors }}</div>{% endif %}
+    <label class="field-label">Confirm password</label>
+    {{ form.password2 }}
+    <button class="auth-submit" type="submit">Create Account</button>
+  </form>
+  <p class="desc" style="margin-top:16px;">Already have an account? <a href="{% url 'accounts:login' %}" style="color:var(--blue); font-weight:700;">Sign in</a></p>
+</div>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}{{ subject.name }} Solved Papers — Diamond Learning{% endblock %}
+{% block content %}
+<div class="crumbs">
+  <a href="{% url 'papers:solved_papers_home' %}">Solved Papers</a><span class="sep">/</span>
+  <span class="current">{{ subject.name }} ({{ level.code }})</span>
+</div>
+<div class="syl-hero">
+  <h1>{{ subject.name }}</h1>
+  <form method="get" style="margin-top:12px; max-width:400px;"><input type="text" name="q" placeholder="Search solved questions…" value="{{ q }}"></form>
+</div>
+<div class="subject-panel">
+  {% for paper_number, questions in grouped.items %}
+  <h3>{{ paper_number }}</h3>
+  {% for sq in questions %}
+    <div class="paper-card" style="margin-bottom:14px;">
+      <div class="paper-card-title">{{ sq.year }} — Question {{ sq.question_number }}</div>
+      <p class="desc"><strong>Q:</strong> {{ sq.question_text }}</p>
+      <p class="desc"><strong>Step-by-step:</strong> {{ sq.step_by_step_explanation }}</p>
+      <p class="desc"><strong>Answer:</strong> {{ sq.final_answer }}</p>
+      {% if sq.topic %}<p class="paper-progress-text">Topic: {{ sq.topic.title }}</p>{% endif %}
+    </div>
+  {% endfor %}
+  {% empty %}
+    <p class="desc">No solved questions for {{ subject.name }} yet.</p>
+  {% endfor %}
+</div>
+{% endblock %}

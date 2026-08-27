@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Diamond Learning — Pressure makes diamonds.{% endblock %}
+{% block content %}
+<div class="hero">
+  <div>
+    <h1>Pressure makes <span class="accent">diamonds.</span></h1>
+    <p class="sub">Diamond Learning helps students turn exam pressure into results through structured learning, past papers, solved questions, notes, syllabus tracking and AI-powered academic assistance — built for PSLE, JCE and BGCSE.</p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="{% url 'papers:past_papers_home' %}">Explore Past Papers</a>
+      <a class="btn btn-outline" href="{% url 'papers:solved_papers_home' %}">Explore Solved Papers</a>
+      {% if not user.is_authenticated %}
+      <a class="btn btn-outline" href="{% url 'accounts:register' %}">Sign Up</a>
+      {% endif %}
+      <a class="btn btn-outline" href="{% url 'chatbot:chat_home' %}">Ask Tebogo</a>
+    </div>
+  </div>
+  <div class="placeholder-box">
+    <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+    <div>Structured lessons. Real past papers.<br>Built for BEC exams.</div>
+  </div>
+</div>
+
+<div class="cards">
+  <div class="fcard">
+    <div class="fcard-icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+    </div>
+    <h3>Syllabus</h3>
+    <p class="desc">Browse the official PSLE, JCE and BGCSE syllabus and mark topics as you cover them.</p>
+    <a class="cta" href="{% url 'syllabus:level_list' %}">Open Syllabus</a>
+  </div>
+  <div class="fcard">
+    <div class="fcard-icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.4 8.5 8.5 0 0 1-4-1L3 20l1.1-5.5A8.38 8.38 0 0 1 12.5 3a8.5 8.5 0 0 1 8.5 8.5z"/></svg>
+    </div>
+    <h3>Ask Tebogo</h3>
+    <p class="desc">Stuck on a question? Ask Tebogo and get a step-by-step answer, in English or Setswana.</p>
+    <a class="cta" href="{% url 'chatbot:chat_home' %}">Ask now</a>
+  </div>
+  <div class="fcard">
+    <div class="fcard-icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+    </div>
+    <h3>Notes</h3>
+    <p class="desc">All your notes in one place, organised by subject and topic automatically.</p>
+    <a class="cta" href="{% url 'notes:level_list' %}">Open Notes</a>
+  </div>
+</div>
+{% endblock %}

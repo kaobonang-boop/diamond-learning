@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block title %}Past Papers — Diamond Learning{% endblock %}
+{% block content %}
+<div class="syl-hero"><h1>Past Papers</h1><p>Pick your level, then a subject, then a paper, then the year you need.</p></div>
+{% include "papers/_level_grid.html" with levels=levels url_name="papers:past_papers_subject" %}
+{% endblock %}
