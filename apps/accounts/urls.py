@@ -15,4 +15,7 @@ urlpatterns = [
     path("password/reset/done/", views.DiamondPasswordResetDoneView.as_view(), name="password_reset_done"),
     path("password/reset/confirm/<uidb64>/<token>/", views.DiamondPasswordResetConfirmView.as_view(), name="password_reset_confirm"),
     path("password/reset/complete/", views.DiamondPasswordResetCompleteView.as_view(), name="password_reset_complete"),
+
+    path("ajax/login/", views.ajax_login, name="ajax_login"),
+    path("ajax/register/", views.ajax_register, name="ajax_register"),
 ]
