@@ -13,20 +13,10 @@ class RegistrationForm(UserCreationForm):
     education_level = forms.ModelChoiceField(
         queryset=EducationLevel.objects.all(), empty_label=None, widget=forms.RadioSelect
     )
-    subjects = forms.ModelMultipleChoiceField(
-        queryset=Subject.objects.none(), required=False, widget=forms.CheckboxSelectMultiple
-    )
 
     class Meta:
         model = User
-        fields = ["first_name", "last_name", "username", "email", "education_level", "subjects", "password1", "password2"]
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # Populate subject choices for whichever level is posted/initial, so the
-        # checkbox list narrows to the chosen level (handled client-side in the
-        # template; server-side we just accept any valid subject for validation).
-        self.fields["subjects"].queryset = Subject.objects.select_related("education_level")
+        fields = ["first_name", "last_name", "username", "email", "education_level", "password1", "password2"]
 
     def save(self, commit=True):
         user = super().save(commit=commit)
@@ -34,7 +24,6 @@ class RegistrationForm(UserCreationForm):
             profile, _ = UserProfile.objects.get_or_create(user=user)
             profile.education_level = self.cleaned_data["education_level"]
             profile.save()
-            profile.subjects.set(self.cleaned_data["subjects"])
         return user
 
 

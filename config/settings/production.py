@@ -41,6 +41,13 @@ else:
         }
     }
 
+# Render (and most PaaS hosts) terminate HTTPS at a proxy and forward plain
+# HTTP to the app, setting X-Forwarded-Proto to say what the original
+# request was. Without this line, Django can't tell the request was secure,
+# which breaks SECURE_SSL_REDIRECT and — critically — CSRF validation on
+# every POST request, including login. This is what was breaking sign-in.
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
 SECURE_SSL_REDIRECT = os.getenv("DJANGO_SECURE_SSL_REDIRECT", "True") == "True"
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
