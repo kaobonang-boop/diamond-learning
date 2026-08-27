@@ -6,26 +6,34 @@
   <p>Everything you're examined on, broken down by level — straight from the BEC syllabus. Pick a level below, then a subject to see its topics.</p>
 </div>
 
-{% for level in levels %}
-<div class="panel-intro">
-  <div class="panel-badge">{{ level.code }}</div>
-  <div>
-    <h2>{{ level.name }}</h2>
-    <p>{{ level.description }}</p>
-  </div>
+<div class="tabs">
+  {% for level in levels %}
+    <button type="button" class="tab-btn {% if forloop.first %}active{% endif %}" onclick="showLevelTab(this, '{{ level.code|lower }}')">{{ level.code }}</button>
+  {% endfor %}
 </div>
-<div class="subject-panel" style="margin-bottom:14px;">
-  <h3>Subjects offered</h3>
-  <div class="subject-grid">
-    {% for subject in level.subjects.all %}
-      <a class="subject-tile" href="{% url 'syllabus:subject_detail' level.code|lower subject.slug %}">
-        <div class="subject-tile-icon">{{ subject.name|slice:":2"|upper }}</div>
-        <div class="subject-tile-name">{{ subject.name }}</div>
-        <div class="subject-tile-meta">{{ subject.topics.count }} topic{{ subject.topics.count|pluralize }}</div>
-      </a>
-    {% empty %}
-      <p class="desc">No subjects seeded yet for this level.</p>
-    {% endfor %}
+
+{% for level in levels %}
+<div class="panel {% if forloop.first %}active{% endif %}" data-level-panel="{{ level.code|lower }}">
+  <div class="panel-intro">
+    <div class="panel-badge">{{ level.code }}</div>
+    <div>
+      <h2>{{ level.name }}</h2>
+      <p>{{ level.description }}</p>
+    </div>
+  </div>
+  <div class="subject-panel">
+    <h3>Subjects offered</h3>
+    <div class="subject-grid">
+      {% for subject in level.subjects.all %}
+        <a class="subject-tile" href="{% url 'syllabus:subject_detail' level.code|lower subject.slug %}">
+          <div class="subject-tile-icon">{{ subject.name|slice:":2"|upper }}</div>
+          <div class="subject-tile-name">{{ subject.name }}</div>
+          <div class="subject-tile-meta">{{ subject.topics.count }} topic{{ subject.topics.count|pluralize }}</div>
+        </a>
+      {% empty %}
+        <p class="desc">No subjects seeded yet for this level.</p>
+      {% endfor %}
+    </div>
   </div>
 </div>
 {% endfor %}
