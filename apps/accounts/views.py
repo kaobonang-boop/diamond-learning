@@ -1,14 +1,17 @@
 from django.contrib import messages
-from django.contrib.auth import login
+from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.views import (
     LoginView, LogoutView,
     PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView, PasswordResetCompleteView,
     PasswordChangeView, PasswordChangeDoneView,
 )
+from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views import View
+from django.views.decorators.http import require_POST
 
 from .forms import RegistrationForm, ProfileEditForm
 
@@ -79,3 +82,28 @@ class DiamondPasswordChangeView(PasswordChangeView):
 
 class DiamondPasswordChangeDoneView(PasswordChangeDoneView):
     template_name = "accounts/password_change_done.html"
+
+
+@require_POST
+def ajax_login(request):
+    """Powers the sign-in popup. Same validation as the real login page,
+    just returns JSON instead of a redirect so the modal can stay open."""
+    form = AuthenticationForm(request, data=request.POST)
+    if form.is_valid():
+        login(request, form.get_user())
+        return JsonResponse({"success": True, "redirect_url": reverse_lazy("core:dashboard").__str__()})
+    return JsonResponse({"success": False, "error": "Incorrect username or password."}, status=400)
+
+
+@require_POST
+def ajax_register(request):
+    """Powers the sign-up popup. Reuses RegistrationForm so it's the exact
+    same validation and account-creation logic as the full page."""
+    form = RegistrationForm(request.POST)
+    if form.is_valid():
+        user = form.save()
+        login(request, user)
+        return JsonResponse({"success": True, "redirect_url": reverse_lazy("core:dashboard").__str__()})
+    # Flatten form errors into one readable message for the modal's single error box.
+    first_error = next(iter(form.errors.values()))[0]
+    return JsonResponse({"success": False, "error": first_error}, status=400)
