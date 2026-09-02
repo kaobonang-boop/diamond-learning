@@ -22,8 +22,9 @@
     <form class="searchbar-wrap" action="{% url 'core:search' %}" method="get">
       <div class="searchbar">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input type="text" name="q" placeholder="Diamond Search subjects, papers, pages…" value="{{ request.GET.q }}">
+        <input type="text" name="q" id="site-search" placeholder="Diamond Search subjects, papers, pages…" value="{{ request.GET.q }}" autocomplete="off" oninput="handleSearch(this.value)" onfocus="handleSearch(this.value)">
       </div>
+      <div class="search-results" id="search-results"></div>
     </form>
 
     <div class="top-actions">
@@ -175,13 +176,6 @@
       <input class="field-input" name="username" type="text" required>
       <label class="field-label">Email</label>
       <input class="field-input" name="email" type="email" required>
-      <label class="field-label">Your level</label>
-      <div class="level-pick">
-        {% for level in AUTH_MODAL_LEVELS %}
-          <button type="button" class="level-pick-btn {% if forloop.first %}active{% endif %}" data-level-id="{{ level.id }}" onclick="pickModalLevel({{ level.id }})">{{ level.code }}</button>
-        {% endfor %}
-      </div>
-      <input type="hidden" name="education_level" id="signup-level-input" value="{{ AUTH_MODAL_LEVELS.first.id }}">
       <label class="field-label">Password</label>
       <input class="field-input" name="password1" type="password" required>
       <label class="field-label">Confirm password</label>
@@ -204,6 +198,36 @@ function showLevelTab(btn, code){
     p.classList.toggle('active', p.dataset.levelPanel === code);
   });
 }
+let searchDebounce;
+function handleSearch(query){
+  clearTimeout(searchDebounce);
+  const box = document.getElementById('search-results');
+  const q = query.trim();
+  if(!q){ box.classList.remove('show'); box.innerHTML = ''; return; }
+  searchDebounce = setTimeout(async () => {
+    try {
+      const resp = await fetch("{% url 'core:search_suggest' %}?q=" + encodeURIComponent(q));
+      const data = await resp.json();
+      if(data.matches.length === 0){
+        box.innerHTML = `<div class="search-empty">No matches for "${q}"</div>`;
+      } else {
+        box.innerHTML = data.matches.map(item => `
+          <a class="search-result" href="${item.url}">
+            <span class="search-result-name">${item.name}</span>
+            <span class="search-result-tag">${item.tag}</span>
+          </a>
+        `).join('') + `<a class="search-result" href="${data.see_all_url}"><span class="search-result-name">See all results for "${q}"</span></a>`;
+      }
+      box.classList.add('show');
+    } catch(err){ /* fail quietly — Enter still submits the form to the full results page */ }
+  }, 200);
+}
+document.addEventListener('click', (e) => {
+  const wrap = document.querySelector('.searchbar-wrap');
+  if(wrap && !wrap.contains(e.target)){
+    document.getElementById('search-results').classList.remove('show');
+  }
+});
 function openAuthModal(mode){
   document.getElementById('auth-modal').classList.add('show');
   switchAuthMode(mode || 'signin');
@@ -221,10 +245,6 @@ function switchAuthMode(mode){
   document.getElementById('auth-title').textContent = isSignup ? 'Create your account' : 'Welcome back';
   document.getElementById('auth-subtitle').textContent = isSignup ? "It's free to get started." : 'Sign in to keep your progress synced across devices.';
   document.getElementById('auth-error').classList.remove('show');
-}
-function pickModalLevel(id){
-  document.getElementById('signup-level-input').value = id;
-  document.querySelectorAll('.level-pick-btn').forEach(b => b.classList.toggle('active', b.dataset.levelId == id));
 }
 function getCookie(name){
   const match = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
