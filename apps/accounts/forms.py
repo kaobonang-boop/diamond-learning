@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
-from apps.syllabus.models import EducationLevel, Subject
+from apps.syllabus.models import Subject
 from .models import UserProfile
 
 
@@ -10,20 +10,14 @@ class RegistrationForm(UserCreationForm):
     first_name = forms.CharField(max_length=150, required=True)
     last_name = forms.CharField(max_length=150, required=True)
     email = forms.EmailField(required=True)
-    education_level = forms.ModelChoiceField(
-        queryset=EducationLevel.objects.all(), empty_label=None, widget=forms.RadioSelect
-    )
 
     class Meta:
         model = User
-        fields = ["first_name", "last_name", "username", "email", "education_level", "password1", "password2"]
-
-    def save(self, commit=True):
+               fields = ["first_name", "last_name", "username", "email", "password1", "password2"]
+       def save(self, commit=True):
         user = super().save(commit=commit)
         if commit:
-            profile, _ = UserProfile.objects.get_or_create(user=user)
-            profile.education_level = self.cleaned_data["education_level"]
-            profile.save()
+            UserProfile.objects.get_or_create(user=user)
         return user
 
 
