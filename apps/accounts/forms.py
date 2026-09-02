@@ -13,10 +13,13 @@ class RegistrationForm(UserCreationForm):
 
     class Meta:
         model = User
-               fields = ["first_name", "last_name", "username", "email", "password1", "password2"]
-       def save(self, commit=True):
+        fields = ["first_name", "last_name", "username", "email", "password1", "password2"]
+
+    def save(self, commit=True):
         user = super().save(commit=commit)
         if commit:
+            # Education level isn't asked at sign-up — students pick it later
+            # in Account settings, keeping the sign-up form quick.
             UserProfile.objects.get_or_create(user=user)
         return user
 
