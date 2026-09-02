@@ -9,7 +9,18 @@ from .models import EducationLevel, Subject, Topic, TopicProgress
 def level_list(request):
     levels = EducationLevel.objects.prefetch_related("subjects")
     active = request.GET.get("level", "psle")
-    return render(request, "syllabus/level_list.html", {"levels": levels, "active": active})
+
+    # Real per-subject syllabus completion, for the progress bar on each tile.
+    # Anonymous visitors just see 0% everywhere — nothing to track yet.
+    subject_percents = {}
+    if request.user.is_authenticated:
+        for level in levels:
+            for subject in level.subjects.all():
+                subject_percents[subject.id] = syllabus_completion_percent(request.user, subject)
+
+    return render(request, "syllabus/level_list.html", {
+        "levels": levels, "active": active, "subject_percents": subject_percents,
+    })
 
 
 def subject_detail(request, level_code, subject_slug):
