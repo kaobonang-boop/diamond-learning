@@ -2,14 +2,25 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
-from apps.syllabus.models import Subject
+from apps.syllabus.models import EducationLevel, Subject
 from .models import UserProfile
+
+
+class LevelChoiceField(forms.ModelChoiceField):
+    def label_from_instance(self, obj):
+        return obj.code
 
 
 class RegistrationForm(UserCreationForm):
     first_name = forms.CharField(max_length=150, required=True)
     last_name = forms.CharField(max_length=150, required=True)
     email = forms.EmailField(required=True)
+    education_level = LevelChoiceField(
+        queryset=EducationLevel.objects.all(),
+        widget=forms.RadioSelect,
+        empty_label=None,
+        error_messages={"required": "Please choose your level (PSLE, JCE or BGCSE)."},
+    )
 
     class Meta:
         model = User
@@ -18,10 +29,40 @@ class RegistrationForm(UserCreationForm):
     def save(self, commit=True):
         user = super().save(commit=commit)
         if commit:
-            # Education level isn't asked at sign-up — students pick it later
-            # in Account settings, keeping the sign-up form quick.
-            UserProfile.objects.get_or_create(user=user)
+            # Use the profile the post_save signal already attached to this user,
+            # so the view that redirects afterwards sees the level we set here.
+            try:
+                profile = user.profile
+            except UserProfile.DoesNotExist:
+                profile = UserProfile.objects.create(user=user)
+            # Compulsory subjects are assigned straight away. For PSLE that is
+            # every subject; JCE/BGCSE students pick their optional ones next.
+            profile.apply_level(self.cleaned_data["education_level"])
         return user
+
+
+class LevelForm(forms.Form):
+    """Used by existing students who have no level yet, or who move up a level."""
+    education_level = LevelChoiceField(
+        queryset=EducationLevel.objects.all(),
+        widget=forms.RadioSelect,
+        empty_label=None,
+        error_messages={"required": "Please choose your level."},
+    )
+
+
+class OptionalSubjectsForm(forms.Form):
+    """Optional (non-compulsory) subjects for the student's level."""
+    subjects = forms.ModelMultipleChoiceField(
+        queryset=Subject.objects.none(),
+        widget=forms.CheckboxSelectMultiple,
+        required=False,
+    )
+
+    def __init__(self, *args, level=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        if level is not None:
+            self.fields["subjects"].queryset = level.optional_subjects()
 
 
 class ProfileEditForm(forms.ModelForm):
@@ -31,9 +72,8 @@ class ProfileEditForm(forms.ModelForm):
 
     class Meta:
         model = UserProfile
-        fields = ["education_level", "subjects", "avatar", "bio"]
+        fields = ["avatar", "bio"]
         widgets = {
-            "subjects": forms.CheckboxSelectMultiple,
             "bio": forms.Textarea(attrs={"rows": 4}),
         }
 
