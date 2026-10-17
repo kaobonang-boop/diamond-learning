@@ -68,16 +68,45 @@ def overall_percent_for_level(user, education_level) -> int:
     return round(sum(values) / len(values)) if values else 0
 
 
+def _bar(done: int, total: int) -> dict:
+    return {"done": done, "total": total, "percent": round(100 * done / total) if total else 0}
+
+
 def dashboard_summary(user):
+    """Numbers for the three dashboard progress bars (Topics, Papers, Notes),
+    totalled across the student's own subjects. A student with no subjects
+    saved yet falls back to every subject at their level."""
     profile = getattr(user, "profile", None)
     level = profile.education_level if profile else None
-    overall = overall_percent_for_level(user, level) if level else 0
-    subjects = profile.subjects.all() if profile else Subject.objects.none()
+
+    subjects = Subject.objects.none()
+    if level:
+        subjects = profile.subjects.filter(education_level=level)
+        if not subjects.exists():
+            subjects = Subject.objects.filter(education_level=level)
+
+    topics_total = Topic.objects.filter(subject__in=subjects).count()
+    topics_done = TopicProgress.objects.filter(
+        user=user, topic__subject__in=subjects, status=TopicProgress.COMPLETED
+    ).count()
+
+    notes_total = Note.objects.filter(topic__subject__in=subjects).count()
+    notes_done = NoteReadProgress.objects.filter(
+        user=user, note__topic__subject__in=subjects, completed=True
+    ).count()
+
+    # "Papers" = topical paper questions, counted once the student has got
+    # them right at least once (same rule as the My Progress page).
+    papers_total = TopicalQuestion.objects.filter(topic__subject__in=subjects).count()
+    papers_done = (
+        TopicalAttempt.objects.filter(user=user, is_correct=True, question__topic__subject__in=subjects)
+        .values("question_id").distinct().count()
+    )
+
     return {
         "level": level,
-        "overall_percent": overall,
         "subjects": subjects,
-        "questions_answered": TopicalAttempt.objects.filter(user=user).count(),
-        "notes_completed": NoteReadProgress.objects.filter(user=user, completed=True).count(),
-        "topics_completed": TopicProgress.objects.filter(user=user, status=TopicProgress.COMPLETED).count(),
+        "topics": _bar(topics_done, topics_total),
+        "papers": _bar(papers_done, papers_total),
+        "notes": _bar(notes_done, notes_total),
     }
