@@ -115,3 +115,50 @@ class DiamondPasswordResetView(PasswordResetView):
     email_template_name = "accounts/password_reset_email.html"
     subject_template_name = "accounts/password_reset_subject.txt"
     success_url = reverse_lazy("accounts:password_reset_done")
+
+
+class DiamondPasswordResetDoneView(PasswordResetDoneView):
+    template_name = "accounts/password_reset_done.html"
+
+
+class DiamondPasswordResetConfirmView(PasswordResetConfirmView):
+    template_name = "accounts/password_reset_confirm.html"
+    success_url = reverse_lazy("accounts:password_reset_complete")
+
+
+class DiamondPasswordResetCompleteView(PasswordResetCompleteView):
+    template_name = "accounts/password_reset_complete.html"
+
+
+class DiamondPasswordChangeView(PasswordChangeView):
+    template_name = "accounts/password_change.html"
+    success_url = reverse_lazy("accounts:password_change_done")
+
+
+class DiamondPasswordChangeDoneView(PasswordChangeDoneView):
+    template_name = "accounts/password_change_done.html"
+
+
+@require_POST
+def ajax_login(request):
+    """Powers the sign-in popup. Same validation as the real login page,
+    just returns JSON instead of a redirect so the modal can stay open."""
+    form = AuthenticationForm(request, data=request.POST)
+    if form.is_valid():
+        login(request, form.get_user())
+        return JsonResponse({"success": True, "redirect_url": reverse_lazy("core:dashboard").__str__()})
+    return JsonResponse({"success": False, "error": "Incorrect username or password."}, status=400)
+
+
+@require_POST
+def ajax_register(request):
+    """Powers the sign-up popup. Reuses RegistrationForm so it's the exact
+    same validation and account-creation logic as the full page."""
+    form = RegistrationForm(request.POST)
+    if form.is_valid():
+        user = form.save()
+        login(request, user)
+        return JsonResponse({"success": True, "redirect_url": after_level_chosen_url(user.profile)})
+    # Flatten form errors into one readable message for the modal's single error box.
+    first_error = next(iter(form.errors.values()))[0]
+    return JsonResponse({"success": False, "error": first_error}, status=400)
