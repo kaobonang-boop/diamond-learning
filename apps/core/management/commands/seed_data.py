@@ -44,6 +44,17 @@ LEVELS = {
     },
 }
 
+# Compulsory subjects per level. Everything else on a level's list is optional
+# and picked by the student at sign-up. PSLE has no choice: every subject is
+# compulsory. Edit these lists to change which subjects students are asked to
+# choose. seed_data runs on every deploy, so the lists here are the source of
+# truth (an "Is core" change made only in /admin/ would be reset).
+CORE_SUBJECTS = {
+    "PSLE": None,  # None = every PSLE subject is compulsory
+    "JCE": ["Mathematics", "English", "Science", "Setswana", "Social Studies", "Agriculture", "Moral Education"],
+    "BGCSE": ["Mathematics", "English Language", "Setswana"],
+}
+
 # Subjects to flesh out fully with topics/notes/papers/questions (kept to a
 # manageable demo set rather than all ~57 subject/level combinations).
 DETAILED_SUBJECTS = {
@@ -77,179 +88,4 @@ DETAILED_SUBJECTS = {
              ["Apply Newton's laws of motion", "Calculate work, energy and power", "Analyse motion graphs"]),
             ("Electricity", "Circuits, current, and electrical energy.",
              ["Apply Ohm's law", "Analyse series and parallel circuits", "Calculate electrical power and energy"]),
-            ("Waves", "Properties and behaviour of waves.",
-             ["Distinguish transverse and longitudinal waves", "Calculate wave speed, frequency and wavelength", "Explain reflection and refraction"]),
-        ],
-        "paper_numbers": ["Paper 1 (Multiple Choice)", "Paper 3 (Theory)", "Paper 5 (Alt. to Practical)"],
-    },
-    ("BGCSE", "Biology"): {
-        "topics": [
-            ("Digestive System", "How the body breaks down and absorbs food.",
-             ["Name the organs of the digestive system in order", "Explain the role of enzymes in digestion", "Describe absorption in the small intestine"]),
-            ("Cell Biology", "The structure and function of plant and animal cells.",
-             ["Label a plant and animal cell", "Compare plant and animal cell structures", "Explain the function of key organelles"]),
-            ("Respiration", "How organisms release energy from food.",
-             ["Distinguish aerobic and anaerobic respiration", "Write word equations for respiration", "Explain gas exchange in the lungs"]),
-        ],
-        "paper_numbers": ["Paper 1 (Multiple Choice)", "Paper 3 (Theory)", "Paper 4 (Practical Test)", "Paper 5 (Alt. to Practical)"],
-    },
-    ("JCE", "Mathematics"): {
-        "topics": [
-            ("Number", "Working confidently with all number types.",
-             ["Perform operations with fractions and decimals", "Understand ratio and proportion", "Calculate percentages"]),
-            ("Algebra", "Introduction to algebraic manipulation.",
-             ["Simplify expressions", "Solve linear equations", "Substitute into formulae"]),
-            ("Geometry and Measurement", "Shapes, area, volume, and angles.",
-             ["Calculate area and perimeter", "Calculate volume of solids", "Find missing angles"]),
-        ],
-        "paper_numbers": ["Paper 1", "Paper 2"],
-    },
-    ("JCE", "Science"): {
-        "topics": [
-            ("Digestive System", "How food is broken down and used by the body.",
-             ["Name the main organs of the digestive system", "Describe the journey of food through the body", "Explain the role of digestive enzymes"]),
-            ("Forces and Motion", "How things move and what makes them move.",
-             ["Describe the effects of forces", "Calculate speed from distance and time", "Explain gravity's effect on falling objects"]),
-        ],
-        "paper_numbers": ["Paper 1", "Paper 2"],
-    },
-    ("JCE", "English"): {
-        "topics": [
-            ("Grammar and Usage", "Correct and effective use of English.",
-             ["Use correct tense and agreement", "Apply punctuation rules", "Avoid common errors"]),
-            ("Composition", "Writing for different purposes and audiences.",
-             ["Write a narrative composition", "Write a formal letter", "Structure paragraphs clearly"]),
-        ],
-        "paper_numbers": ["Paper 1", "Paper 2", "Paper 3", "Paper 4"],
-    },
-    ("PSLE", "Mathematics"): {
-        "topics": [
-            ("Whole Numbers", "Place value, the four operations, and word problems.",
-             ["Add and subtract large numbers", "Multiply and divide with regrouping", "Solve word problems"]),
-            ("Fractions and Decimals", "Understanding and operating on parts of a whole.",
-             ["Compare and order fractions", "Convert between fractions and decimals", "Add and subtract fractions"]),
-            ("Shapes and Space", "Recognising and measuring 2D and 3D shapes.",
-             ["Identify properties of 2D shapes", "Calculate area and perimeter", "Recognise 3D shapes and their nets"]),
-        ],
-        "paper_numbers": ["Paper 1"],
-    },
-    ("PSLE", "Science"): {
-        "topics": [
-            ("Digestive System", "How our bodies use the food we eat.",
-             ["Name the main parts of the digestive system", "Describe why we need to digest food", "Explain simple healthy eating habits"]),
-            ("Living Things", "Classifying and understanding living organisms.",
-             ["Group living things by their features", "Describe basic life processes", "Explain simple food chains"]),
-        ],
-        "paper_numbers": ["Paper 1"],
-    },
-    ("PSLE", "English"): {
-        "topics": [
-            ("Reading Comprehension", "Understanding and responding to short passages.",
-             ["Answer literal and inferential questions", "Identify the main idea", "Build vocabulary from context"]),
-            ("Composition Writing", "Writing simple narrative and descriptive pieces.",
-             ["Write a clear beginning, middle and end", "Use descriptive language", "Check spelling and punctuation"]),
-        ],
-        "paper_numbers": ["Paper 1", "Paper 2"],
-    },
-}
-
-NOTE_PARAGRAPHS = [
-    "This note walks through {topic} step by step, the way it's usually examined at {level} level. Read it once for the overview, then come back to the worked examples when you're practising.",
-    "Start by making sure you understand the key definitions — most marks are lost in exams not because students can't do the method, but because they misread what's actually being asked.",
-    "Worked example: work through a typical exam-style question slowly, writing out every step, including the ones that feel obvious. Examiners give marks for method, not just the final answer.",
-    "Common mistakes students make on this topic include rushing the setup, skipping units, and not checking whether the final answer is realistic. Build the habit of a quick sanity check.",
-    "Before you move on, try the related questions in Topical Papers for this topic, then check your working against the Solved Papers for past exam versions of the same idea.",
-]
-
-
-class Command(BaseCommand):
-    help = "Seed Diamond Learning with realistic PSLE/JCE/BGCSE demo data."
-
-    def handle(self, *args, **options):
-        self.stdout.write("Seeding education levels and subjects…")
-        level_objs = {}
-        for code, info in LEVELS.items():
-            level, _ = EducationLevel.objects.update_or_create(
-                code=code, defaults={"name": info["name"], "description": info["description"], "order": info["order"]}
-            )
-            level_objs[code] = level
-            for name in info["subjects"]:
-                Subject.objects.get_or_create(education_level=level, name=name)
-
-        self.stdout.write("Seeding topics, notes, papers and questions for the demo subject set…")
-        for (level_code, subject_name), detail in DETAILED_SUBJECTS.items():
-            level = level_objs[level_code]
-            subject = Subject.objects.get(education_level=level, name=subject_name)
-
-            for order, (title, description, objectives) in enumerate(detail["topics"]):
-                topic, _ = Topic.objects.get_or_create(
-                    subject=subject, title=title,
-                    defaults={"description": description, "learning_objectives": "\n".join(objectives), "order": order},
-                )
-                Subtopic.objects.get_or_create(topic=topic, title=f"{title} — Worked Examples", defaults={"order": 1})
-                Subtopic.objects.get_or_create(topic=topic, title=f"{title} — Common Exam Questions", defaults={"order": 2})
-
-                # Note
-                content = "\n\n".join(p.format(topic=title, level=level_code) for p in NOTE_PARAGRAPHS)
-                Note.objects.get_or_create(
-                    topic=topic, title=f"{title} — Study Notes",
-                    defaults={"content": content},
-                )
-
-                # Topical (MCQ) questions
-                for i in range(1, 6):
-                    TopicalQuestion.objects.get_or_create(
-                        topic=topic, order=i,
-                        defaults={
-                            "question_text": f"Sample {title} question {i}: which option correctly applies the method covered in this topic?",
-                            "option_a": "Option A — a plausible but incorrect approach",
-                            "option_b": "Option B — the correct method applied fully",
-                            "option_c": "Option C — a common miscalculation",
-                            "option_d": "Option D — an irrelevant distractor",
-                            "correct_option": "B",
-                            "explanation": f"Option B is correct because it applies the {title.lower()} method exactly as covered in the notes for this topic.",
-                        },
-                    )
-
-                # Solved question tied to this topic
-                SolvedQuestion.objects.get_or_create(
-                    subject=subject, topic=topic, year=2025, paper_number=detail["paper_numbers"][0], question_number="1",
-                    defaults={
-                        "question_text": f"A typical {level_code} exam question on {title}.",
-                        "step_by_step_explanation": f"Step 1: identify what's being asked. Step 2: apply the {title.lower()} method from the syllabus. Step 3: check the answer makes sense.",
-                        "final_answer": "See the worked steps above for the final answer and units.",
-                    },
-                )
-
-            # Past papers: last 3 years per paper number, left unattached (no file)
-            # except one demo PDF so the download flow can be tested end to end.
-            demo_pdf = None
-            for paper_number in detail["paper_numbers"]:
-                for year in (2023, 2024, 2025):
-                    paper, created = PastPaper.objects.get_or_create(subject=subject, year=year, paper_number=paper_number)
-                    if created and demo_pdf is None and year == 2025 and paper_number == detail["paper_numbers"][0]:
-                        pdf_bytes = (
-                            b"%PDF-1.4\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n"
-                            b"2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj\n"
-                            b"3 0 obj<</Type/Page/Parent 2 0 R/MediaBox[0 0 300 150]/Contents 4 0 R/Resources<</Font<</F1 5 0 R>>>>>>endobj\n"
-                            b"4 0 obj<</Length 90>>stream\nBT /F1 14 Tf 20 100 Td "
-                            b"(Diamond Learning - Sample Past Paper) Tj ET\nendstream endobj\n"
-                            b"5 0 obj<</Type/Font/Subtype/Type1/BaseFont/Helvetica>>endobj\n"
-                            b"xref\n0 6\ntrailer<</Size 6/Root 1 0 R>>\n%%EOF"
-                        )
-                        paper.file.save(f"{subject.slug}-{paper_number.replace(' ', '_')}-{year}.pdf", ContentFile(pdf_bytes), save=True)
-
-        self.stdout.write("Seeding a demo student account (username: student / password: diamond2026)…")
-        if not User.objects.filter(username="student").exists():
-            demo = User.objects.create_user(
-                username="student", email="student@example.com", password="diamond2026",
-                first_name="Kabelo", last_name="Mokgosi",
-            )
-            profile, _ = UserProfile.objects.get_or_create(user=demo)
-            profile.education_level = level_objs["BGCSE"]
-            profile.save()
-            profile.subjects.set(Subject.objects.filter(
-                education_level=level_objs["BGCSE"], name__in=["Mathematics", "English Language", "Physics"]
-            ))
-
-        self.stdout.write(self.style.SUCCESS("Seed data loaded."))
+            ("Waves", "Properties and
