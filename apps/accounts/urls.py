@@ -8,6 +8,8 @@ urlpatterns = [
     path("logout/", views.DiamondLogoutView.as_view(), name="logout"),
     path("register/", views.RegisterView.as_view(), name="register"),
     path("profile/", views.edit_profile, name="edit_profile"),
+    path("level/", views.choose_level, name="choose_level"),
+    path("subjects/", views.choose_subjects, name="choose_subjects"),
 
     path("password/change/", views.DiamondPasswordChangeView.as_view(), name="password_change"),
     path("password/change/done/", views.DiamondPasswordChangeDoneView.as_view(), name="password_change_done"),
