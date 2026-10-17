@@ -16,12 +16,25 @@ class EducationLevel(models.Model):
     def __str__(self):
         return self.code
 
+    def core_subjects(self):
+        """Subjects every student at this level takes (picked for them automatically)."""
+        return self.subjects.filter(is_core=True)
+
+    def optional_subjects(self):
+        """Subjects a student chooses for themselves (e.g. JCE/BGCSE electives)."""
+        return self.subjects.filter(is_core=False)
+
 
 class Subject(models.Model):
     education_level = models.ForeignKey(EducationLevel, on_delete=models.CASCADE, related_name="subjects")
     name = models.CharField(max_length=150)
     slug = models.SlugField(max_length=170, blank=True)
     description = models.TextField(blank=True)
+    is_core = models.BooleanField(
+        default=True,
+        help_text="Compulsory for every student at this level. Untick for optional/elective subjects "
+                  "that students choose for themselves when they sign up.",
+    )
 
     class Meta:
         ordering = ["name"]
