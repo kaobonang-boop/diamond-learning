@@ -15,8 +15,8 @@ class EducationLevelAdmin(admin.ModelAdmin):
 
 @admin.register(Subject)
 class SubjectAdmin(admin.ModelAdmin):
-    list_display = ("name", "education_level")
-    list_filter = ("education_level",)
+    list_display = ("name", "education_level", "is_core")
+    list_filter = ("education_level", "is_core")
     search_fields = ("name",)
     prepopulated_fields = {"slug": ("name",)}
 
