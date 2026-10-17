@@ -9,7 +9,6 @@ from django.urls import reverse
 from apps.notes.models import Note
 from apps.papers.models import PastPaper, SolvedQuestion, TopicalQuestion
 from apps.syllabus.models import Subject, Topic
-from apps.timetable.models import StudySession
 from apps.progress.services import dashboard_summary
 
 # Minimum similarity (0-1) for a fuzzy match to surface — tuned so a typo
@@ -25,14 +24,12 @@ def home(request):
 @login_required
 def dashboard(request):
     summary = dashboard_summary(request.user)
-    upcoming_sessions = StudySession.objects.filter(user=request.user, completed=False).order_by("date", "start_time")[:5]
     recent_notes = Note.objects.filter(
-        topic__subject__education_level=summary["level"]
+        topic__subject__in=summary["subjects"]
     ).order_by("-last_updated")[:4] if summary["level"] else Note.objects.none()
 
     context = {
         **summary,
-        "upcoming_sessions": upcoming_sessions,
         "recent_notes": recent_notes,
     }
     return render(request, "core/dashboard.html", context)
