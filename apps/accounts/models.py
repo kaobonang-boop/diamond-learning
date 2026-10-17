@@ -15,6 +15,20 @@ class UserProfile(models.Model):
     def __str__(self):
         return f"Profile: {self.user.get_username()}"
 
+    def apply_level(self, level):
+        """Set the student's level and reset their subjects to that level's
+        compulsory ones. Optional subjects are chosen afterwards."""
+        self.education_level = level
+        self.save(update_fields=["education_level"])
+        self.subjects.set(level.core_subjects() if level else [])
+
+    def set_optional_subjects(self, optional_subjects):
+        """Keep the compulsory subjects for the current level and swap the
+        optional ones for exactly the ones given."""
+        if not self.education_level:
+            return
+        self.subjects.set(list(self.education_level.core_subjects()) + list(optional_subjects))
+
     @property
     def display_name(self):
         full = self.user.get_full_name()
