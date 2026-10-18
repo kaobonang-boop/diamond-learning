@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Choose your subjects — Diamond Learning{% endblock %}
+{% block content %}
+<div class="form-card" style="max-width:640px;">
+  <h2 style="margin-bottom:6px;">Pick your {{ level.code }} optional subjects</h2>
+  <p class="picker-note">These compulsory subjects are already included for you:</p>
+  <div class="chip-row">
+    {% for subject in core_subjects %}<span class="chip">{{ subject.name }}</span>{% endfor %}
+  </div>
+
+  <form method="post">
+    {% csrf_token %}
+    <label class="field-label">Tick the optional subjects you take</label>
+    <div class="checkbox-row">{{ form.subjects }}</div>
+    <button class="auth-submit" type="submit">Save and continue</button>
+  </form>
+  <a class="skip-link" href="{% url 'core:dashboard' %}">Skip for now</a>
+</div>
+{% endblock %}
