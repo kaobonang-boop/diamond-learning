@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Choose your level — Diamond Learning{% endblock %}
+{% block content %}
+<div class="form-card" style="max-width:600px;">
+  <h2 style="margin-bottom:6px;">Which level are you studying for?</h2>
+  <p class="picker-note">Your dashboard and progress bars follow this. Changing level resets your subjects to that level's compulsory ones.</p>
+  {% if form.errors %}<div class="form-errors">{{ form.education_level.errors }}</div>{% endif %}
+  <form method="post">
+    {% csrf_token %}
+    <div class="level-options">
+      {% for radio in form.education_level %}
+        <label class="level-option">
+          {{ radio.tag }}
+          <div><b>{{ radio.choice_label }}</b><span>{{ radio.data.value.instance.name }}</span></div>
+        </label>
+      {% endfor %}
+    </div>
+    <button class="auth-submit" type="submit">Continue</button>
+  </form>
+</div>
+{% endblock %}
