@@ -6,8 +6,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>{% block title %}Diamond Learning{% endblock %}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="{% static 'css/style.css' %}">
+<link rel="stylesheet" href="{% static 'css/theme.css' %}">
 {% block extra_head %}{% endblock %}
 </head>
 <body>
@@ -288,6 +289,7 @@ async function submitAuthForm(event, mode){
 document.getElementById('auth-modal').addEventListener('click', (e) => {
   if(e.target.id === 'auth-modal') closeAuthModal();
 });
+document.addEventListener('scroll',()=>document.querySelector('.topbar').classList.toggle('scrolled',scrollY>8),{passive:true});
 </script>
 
 </body>
